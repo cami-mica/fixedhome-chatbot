@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat FixedHome</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">💬 FixedHome Chat</div>
+    <div id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Escribí tu pregunta...">
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function addMessage(text, sender) {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+      msgDiv.textContent = text;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      addMessage("👋 ¡Bienvenido al Chatbot de FixedHome! \nPor favor, escribí tu consulta para comenzar.", "bot");
+    });
+
+    async function sendMessage() {
+      const pregunta = userInput.value.trim();
+      if (!pregunta) return;
+
+      addMessage(pregunta, "user");
+      userInput.value = "";
+
+      try {
+        const response = await fetch('http://localhost:3000/chatbot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pregunta })
+        });
+
+        const data = await response.json();
+        addMessage(data.respuesta, "bot");
+      } catch (error) {
+        addMessage("Lo siento, en este momento no puedo brindarle una respuesta. Por favor comuníquese con Atención al Cliente", "bot");
+        console.error(error);
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
+</body>
+</html>
+
+
+

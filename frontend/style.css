@@ -1,90 +1,105 @@
 body {
-  background: #f0f4f8;
+  font-family: "Segoe UI", sans-serif;
+  background: #f2f3f5;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   margin: 0;
-  font-family: Arial, sans-serif;
 }
 
 .chat-container {
-  width: 100%;
-  max-width: 420px;
-  height: 90vh;
-  background: #fff;
-  border-radius: 12px;
+  width: 380px;
+  max-width: 90%;
+  height: 600px;
+  background: white;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .chat-header {
-  background: #007bff; /* azul principal */
+  background: #0078d7;
   color: white;
-  padding: 15px;
   text-align: center;
+  padding: 15px;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 1.2em;
 }
 
-#chatBox {
+.chat-box {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
-  background: #e9f3fa; /* fondo celeste claro */
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .message {
-  max-width: 75%;
+  max-width: 80%;
   padding: 10px 14px;
-  margin: 6px 0;
-  border-radius: 12px;
+  border-radius: 14px;
   line-height: 1.4;
+  white-space: pre-wrap;
   word-wrap: break-word;
-  font-size: 14px;
+  animation: fadeIn 0.2s ease-in;
 }
 
 .user-message {
   align-self: flex-end;
-  background: #d0e7ff; /* azul claro */
-  border-bottom-right-radius: 0;
+  background: #0078d7;
+  color: white;
+  border-bottom-right-radius: 2px;
 }
 
 .bot-message {
   align-self: flex-start;
-  background: #ffffff;
-  border-bottom-left-radius: 0;
-  border: 1px solid #d6e4f0;
+  background: #e5e5ea;
+  color: black;
+  border-bottom-left-radius: 2px;
 }
 
 .chat-input {
   display: flex;
   padding: 10px;
-  background: #f5f7fa;
-  border-top: 1px solid #d6e4f0;
+  border-top: 1px solid #ddd;
+  background: #fafafa;
 }
 
 .chat-input input {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ccd9e6;
-  border-radius: 20px;
+  border: none;
   outline: none;
-  background: #fff;
+  font-size: 15px;
+  border-radius: 8px;
 }
 
 .chat-input button {
-  background: #007bff;
+  background: #0078d7;
   color: white;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
   margin-left: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 18px;
+  transition: background 0.2s;
 }
+
+.chat-input button:hover {
+  background: #005fa3;
+}
+
+.typing {
+  font-style: italic;
+  color: gray;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

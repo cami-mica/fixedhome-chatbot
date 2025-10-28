@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Chat FixedHome</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="chat-container">
     <div class="chat-header">💬 FixedHome Chat</div>
-    <div id="chatBox"></div>
+    <div id="chatBox" class="chat-box"></div>
     <div class="chat-input">
-      <input type="text" id="userInput" placeholder="Escribí tu pregunta...">
+      <input type="text" id="userInput" placeholder="Escribí tu pregunta..." autocomplete="off" />
       <button id="sendBtn">➤</button>
     </div>
   </div>
@@ -20,17 +20,29 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
 
+    // Función para agregar mensajes al chat
     function addMessage(text, sender) {
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-      msgDiv.textContent = text;
+      msgDiv.innerText = text;
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    // Mensaje de bienvenida
     window.addEventListener("DOMContentLoaded", () => {
-      addMessage("👋 ¡Bienvenido al Chatbot de FixedHome! \nPor favor, escribí tu consulta para comenzar.", "bot");
+      addMessage("👋 ¡Hola! Soy el asistente virtual de FixedHome.\nEscribí tu consulta para comenzar.", "bot");
     });
+
+    // Simula el “escribiendo…” del bot
+    function showTyping() {
+      const typingDiv = document.createElement("div");
+      typingDiv.classList.add("message", "bot-message", "typing");
+      typingDiv.textContent = "Escribiendo...";
+      chatBox.appendChild(typingDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return typingDiv;
+    }
 
     async function sendMessage() {
       const pregunta = userInput.value.trim();
@@ -38,6 +50,8 @@
 
       addMessage(pregunta, "user");
       userInput.value = "";
+
+      const typingDiv = showTyping();
 
       try {
         const response = await fetch('http://localhost:3000/chatbot', {
@@ -47,20 +61,24 @@
         });
 
         const data = await response.json();
-        addMessage(data.respuesta, "bot");
+        chatBox.removeChild(typingDiv);
+        addMessage(data.respuesta || "No encontré una respuesta para eso 😅", "bot");
+
       } catch (error) {
-        addMessage("Lo siento, en este momento no puedo brindarle una respuesta. Por favor comuníquese con Atención al Cliente", "bot");
+        chatBox.removeChild(typingDiv);
+        addMessage("⚠️ Ocurrió un error al conectar con el servidor.", "bot");
         console.error(error);
       }
     }
 
-    sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') sendMessage();
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", e => {
+      if (e.key === "Enter") sendMessage();
     });
   </script>
 </body>
 </html>
+
 
 
 

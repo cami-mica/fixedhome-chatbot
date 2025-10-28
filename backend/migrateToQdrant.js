@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // ---------------- CONFIG ----------------
-const client = new QdrantClient({ url: "http://host.docker.internal:6333" });
+const client = new QdrantClient({ url: "http://localhost:6333" });
 const COLLECTION = 'preguntas_respuestas';
 
 // Conexión MariaDB

@@ -29,12 +29,10 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Mensaje de bienvenida
     window.addEventListener("DOMContentLoaded", () => {
       addMessage("👋 ¡Hola! Soy el asistente virtual de FixedHome.\nEscribí tu consulta para comenzar.", "bot");
     });
 
-    // Simula el “escribiendo…” del bot
     function showTyping() {
       const typingDiv = document.createElement("div");
       typingDiv.classList.add("message", "bot-message", "typing");
@@ -62,7 +60,7 @@
 
         const data = await response.json();
         chatBox.removeChild(typingDiv);
-        addMessage(data.respuesta || "No encontré una respuesta para eso 😅", "bot");
+        addMessage(data.respuesta || "No encontré una respuesta para tu pregunta. Te podés comunicar con Atención al Cliente", "bot");
 
       } catch (error) {
         chatBox.removeChild(typingDiv);

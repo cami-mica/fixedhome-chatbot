@@ -34,11 +34,9 @@ app.post('/chat', async (req, res) => {
     const { pregunta } = req.body;
     if (!pregunta) return res.status(400).json({ error: 'Falta la pregunta del usuario' });
 
-    // 1️⃣ Vectorizamos la pregunta del usuario
     const emb = await extractor(pregunta, { pooling: 'mean', normalize: true });
     const vector = Array.from(emb.data);
 
-    // 2️⃣ Buscamos en Qdrant las más parecidas
     const results = await qdrant.search(COLLECTION, {
       vector,
       limit: 3
@@ -48,17 +46,14 @@ app.post('/chat', async (req, res) => {
       return res.json({ respuesta: 'No encontré una respuesta para tu pregunta.' });
     }
 
-    // 3️⃣ Tomamos el ID del mejor resultado
     const bestMatchId = results[0].id;
 
-    // 4️⃣ Buscamos esa respuesta en MariaDB
     const [rows] = await pool.query('SELECT respuesta FROM PreguntasRespuestas WHERE id = ?', [bestMatchId]);
 
     if (!rows.length) {
       return res.json({ respuesta: 'No encontré una respuesta para tu pregunta.' });
     }
 
-    // 5️⃣ Enviamos la respuesta final al frontend
     res.json({ respuesta: rows[0].respuesta });
 
   } catch (err) {

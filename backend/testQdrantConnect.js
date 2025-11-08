@@ -1,8 +1,8 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 
 const client = new QdrantClient({
-  url: "http://localhost:6333", // tu Qdrant corriendo en Docker
-  // checkCompatibility: false // opcional si da errores de versión
+  url: "http://localhost:6333", 
+  // checkCompatibility: false 
 });
 
 async function testConnection() {

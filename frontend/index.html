@@ -20,7 +20,34 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    // Función para agregar mensajes al chat
+    const categorias = {
+      "🧰 Servicios": [
+        "¿Qué tipo de servicios ofrecen?",
+        "¿Puedo contratar varios servicios al mismo tiempo?",
+        "¿Los profesionales están certificados?",
+        "¿Qué pasa si el trabajo no queda bien hecho?"
+      ],
+      "💵 Precios y pagos": [
+        "¿Cuánto cuesta un servicio?",
+        "¿Puedo pagar en cuotas?",
+        "¿Aceptan transferencias, tarjetas o efectivo?"
+      ],
+      "📅 Turnos y disponibilidad": [
+        "¿Puedo cancelar o reprogramar una cita?",
+        "¿Cuánto tiempo tarda en venir el profesional?",
+        "¿Puedo elegir el horario que me convenga?"
+      ],
+      "🛡️ Seguridad y confianza": [
+        "¿Cómo garantizan la seguridad del profesional que viene a mi casa?",
+        "¿Qué información puedo ver sobre el profesional?",
+        "¿Cómo puedo dejar una opinión o calificación?"
+      ],
+      "❓ Otras dudas": [
+        "¿Qué pasa si tengo una urgencia?",
+        "¿Dónde puedo ver el historial de los servicios que contraté?"
+      ]
+    };
+
     function addMessage(text, sender) {
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", sender === "user" ? "user-message" : "bot-message");
@@ -29,9 +56,73 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      addMessage("👋 ¡Hola! Soy el asistente virtual de FixedHome.\nEscribí tu consulta para comenzar.", "bot");
-    });
+    function addMenu(options, callback, includeBack = false) {
+      const menuDiv = document.createElement("div");
+      menuDiv.classList.add("menu-options");
+
+      options.forEach(opt => {
+        const bubble = document.createElement("div");
+        bubble.classList.add("menu-bubble");
+        bubble.innerText = opt;
+        bubble.onclick = () => callback(opt);
+        menuDiv.appendChild(bubble);
+      });
+
+      if (includeBack) {
+        const backBubble = document.createElement("div");
+        backBubble.classList.add("menu-bubble", "back-button");
+        backBubble.innerText = "↩️ Volver al menú principal";
+        backBubble.onclick = showMainMenu;
+        menuDiv.appendChild(backBubble);
+      }
+
+      chatBox.appendChild(menuDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showMainMenu() {
+      addMessage("👋 ¡Hola! Soy el asistente virtual de FixedHome.\nSeleccioná una categoría para comenzar 👇", "bot");
+      const options = Object.keys(categorias);
+      addMenu(options, categoriaSeleccionada);
+    }
+
+    function categoriaSeleccionada(categoria) {
+      addMessage(categoria, "user");
+      addMessage(`${categoria.split(" ")[0]} Elegí una pregunta sobre ${categoria.replace(/^[^\s]+\s/, "").toLowerCase()} 👇`, "bot");
+      addMenu(categorias[categoria], preguntaSeleccionada);
+    }
+
+    async function preguntaSeleccionada(pregunta) {
+      addMessage(pregunta, "user");
+
+      const typingDiv = showTyping();
+
+      try {
+        const response = await fetch('http://localhost:3000/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pregunta })
+        });
+        const data = await response.json();
+        chatBox.removeChild(typingDiv);
+        addMessage(data.respuesta || "No encontré una respuesta para tu pregunta.", "bot");
+        
+        // 👉 Agregar botón para volver al menú principal
+        const backDiv = document.createElement("div");
+        backDiv.classList.add("menu-options");
+        const backButton = document.createElement("div");
+        backButton.classList.add("menu-bubble", "back-button");
+        backButton.innerText = "↩️ Volver al menú principal";
+        backButton.onclick = showMainMenu;
+        backDiv.appendChild(backButton);
+        chatBox.appendChild(backDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+      } catch (error) {
+        chatBox.removeChild(typingDiv);
+        addMessage("⚠️ Ocurrió un error al conectar con el servidor.", "bot");
+      }
+    }
 
     function showTyping() {
       const typingDiv = document.createElement("div");
@@ -42,13 +133,19 @@
       return typingDiv;
     }
 
+    window.addEventListener("DOMContentLoaded", showMainMenu);
+
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", e => {
+      if (e.key === "Enter") sendMessage();
+    });
+
     async function sendMessage() {
       const pregunta = userInput.value.trim();
       if (!pregunta) return;
 
       addMessage(pregunta, "user");
       userInput.value = "";
-
       const typingDiv = showTyping();
 
       try {
@@ -57,26 +154,15 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pregunta })
         });
-
         const data = await response.json();
         chatBox.removeChild(typingDiv);
-        addMessage(data.respuesta || "No encontré una respuesta para tu pregunta. Te podés comunicar con Atención al Cliente", "bot");
-
+        addMessage(data.respuesta || "No encontré una respuesta para tu pregunta.", "bot");
       } catch (error) {
         chatBox.removeChild(typingDiv);
         addMessage("⚠️ Ocurrió un error al conectar con el servidor.", "bot");
-        console.error(error);
       }
     }
-
-    sendBtn.addEventListener("click", sendMessage);
-    userInput.addEventListener("keypress", e => {
-      if (e.key === "Enter") sendMessage();
-    });
   </script>
 </body>
 </html>
-
-
-
 
